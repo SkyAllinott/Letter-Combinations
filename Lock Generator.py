@@ -11,24 +11,17 @@ letters = [i.upper() for i in letters]
 
 # Load the dictionary file into a dictionary object
 def load_dict(path):
-    Dictionary={}
-    with open(path) as Dictionary_File:
-        for word in Dictionary_File:
-            # only look at words with the same number of letters as
-            # we have character dials
-            if len(word.strip()) == len(letters):
-                Dictionary[word.strip().upper()] = False
-    return Dictionary
+    with open(path) as f:
+        # only look at words with the same number of letters as
+        # we have character dials
+        return { w.strip().upper():False for w in f if len(w.strip()) == len(letters)}
 
 # Recursively build every word from letter list and check against
 # dictionary
 def check_word(word_so_far, remaining_dials, word_dict):
     # check completed word against dictionary
     if len(remaining_dials) == 0:
-        if word_so_far in word_dict:
-            return [word_so_far]
-        else:
-            return []
+        return [word_so_far] if word_so_far in word_dict else []
     # build all words with next set of letters and recurse
     else:
         wordlist = []
@@ -45,7 +38,7 @@ def main():
     print(matching_words)
 
     # build dictionary from word list (cuz speed)
-    matching_words_dict = {i:None for i in matching_words}
+    matching_words_dict = set(matching_words)
 
     # compare input against matched dictionary
     while True:
