@@ -1,51 +1,35 @@
 # All letters available
-letters = [
+LETTERS = [
     'cgflbptsmd',
     'earthiuoyl',
     'ealtoinsrm',
     'plyamdkesx'
 ]
 
-# convert letters to uppercase
-letters = [i.upper() for i in letters]
 
-# Load the dictionary file into a dictionary object
-def load_dict(path):
+# Load the dictionary file into a set
+def load_dict(path, word_filter):
     with open(path) as f:
-        # only look at words with the same number of letters as
-        # we have character dials
-        return { w.strip().upper():False for w in f if len(w.strip()) == len(letters)}
+        # discard words not matching filter
+        return set(i.strip().upper() for i in f if word_filter(i.strip().upper()))
 
-# Recursively build every word from letter list and check against
-# dictionary
-def check_word(word_so_far, remaining_dials, word_dict):
-    # check completed word against dictionary
-    if len(remaining_dials) == 0:
-        return [word_so_far] if word_so_far in word_dict else []
-    # build all words with next set of letters and recurse
-    else:
-        wordlist = []
-        for c in remaining_dials[0]:
-            wordlist += check_word(word_so_far + c, remaining_dials[1:], word_dict)
-        return wordlist
+# check word can be written on dial
+def check_word(word, letter_matrix):
+    return len(word) == len(letter_matrix) and all([c in letter_matrix[i] for i, c in enumerate(word)])
 
 def main():
-    # load dictionary
-    word_dict = load_dict("Dictionary.txt")
+    # load uppercased letters into hash matrix
+    letter_matrix = [set(i.upper()) for i in LETTERS]
 
-    # compare letters with dictionary
-    matching_words = check_word("", letters, word_dict)
+    # load dictionary and compare entries
+    matching_words = load_dict("Dictionary.txt", lambda w: check_word(w, letter_matrix))
     print(matching_words)
-
-    # build dictionary from word list (cuz speed)
-    matching_words_dict = set(matching_words)
 
     # compare input against matched dictionary
     while True:
-        x = input("Type a word and see if it can be spelled: ").upper()
-        print(x in matching_words_dict)
+        x = input("Type a word and see if it can be spelled: ").upper().strip()
+        print(x in matching_words)
 
 if __name__ == '__main__':
     main()
-
 
